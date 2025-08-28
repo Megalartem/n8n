@@ -115,12 +115,9 @@ services:
     env_file:
       - .env
     depends_on:
-      cache:
-        condition: service_healthy
-      db:
-        condition: service_healthy
-      traefik:
-        condition: service_healthy
+      - cache
+      - db
+      - traefik
     networks:
       default:
         ipv4_address: 10.10.80.2
