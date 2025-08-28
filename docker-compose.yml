@@ -33,7 +33,7 @@ services:
       - db:/var/lib/postgresql/data
 
   pg_admin4:
-    image: dpage/pgadmin4:7.5
+    image: dpage/pgadmin4:9.7.0
     container_name: summarizer_pgadmin4
     hostname: pgadmin
     restart: always
@@ -57,7 +57,7 @@ services:
       - traefik.http.routers.pgadmin.tls.certresolver=mytlschallenge
 
   traefik:
-    image: "traefik"
+    image: traefik
     restart: always
     command:
       - "--api=true"
