@@ -63,7 +63,6 @@ services:
     restart: always
     command:
       - "--api=true"
-      - "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
