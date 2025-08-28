@@ -79,6 +79,9 @@ services:
     networks:
       default:
         ipv4_address: 10.10.80.3
+    depends_on:
+      - pg_admin4
+      - n8n
     volumes:
       - traefik_data:/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -117,7 +120,6 @@ services:
     depends_on:
       - cache
       - db
-      - traefik
     networks:
       default:
         ipv4_address: 10.10.80.2
