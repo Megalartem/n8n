@@ -16,7 +16,7 @@ services:
       - cache:/data
 
   db:
-    image: postgres:alpine
+    image: postgres::13.22-alpine
     container_name: n8n_db
     hostname: postgres
     restart: always
