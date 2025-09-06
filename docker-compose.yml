@@ -78,9 +78,7 @@ services:
     networks:
       default:
         ipv4_address: 10.10.80.3
-      traefik:
-        external: true
-        name: traefik
+      traefik: {}
     depends_on:
       - pg_admin4
       - n8n
@@ -152,3 +150,6 @@ networks:
       config:
         - subnet: 10.10.80.0/24
           gateway: 10.10.80.1
+  traefik:               # ✅ объявление внешней сети — здесь, в корне
+    external: true
+    name: traefik
