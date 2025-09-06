@@ -78,9 +78,9 @@ services:
     networks:
       default:
         ipv4_address: 10.10.80.3
-    traefik:
-      external: true
-      name: traefik
+      traefik:
+        external: true
+        name: traefik
     depends_on:
       - pg_admin4
       - n8n
