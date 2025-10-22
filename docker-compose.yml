@@ -150,6 +150,6 @@ networks:
       config:
         - subnet: 10.10.80.0/24
           gateway: 10.10.80.1
-  traefik:               # ✅ объявление внешней сети — здесь, в корне
+  traefik:
     external: true
     name: traefik
