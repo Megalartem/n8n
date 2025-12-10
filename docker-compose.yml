@@ -1,4 +1,5 @@
 version: "3.8"
+
 services:
   cache:
     image: redis:8.2.1-alpine
@@ -38,7 +39,7 @@ services:
     hostname: pgadmin
     restart: always
     ports:
-      - "5050:80"
+      - "127.0.0.1:5050:80"
     environment:
       - PGADMIN_DEFAULT_EMAIL=${DEFAULT_USER_EMAIL}
       - PGADMIN_DEFAULT_PASSWORD=${DEFAULT_USER_PASSWORD}
@@ -49,42 +50,6 @@ services:
       - pg_admin4:/var/lib/pgadmin
     depends_on:
       - db
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.pgadmin.rule=Host(`pgadmin.${DOMAIN_NAME}`)
-      - traefik.http.routers.pgadmin.tls=true
-      - traefik.http.routers.pgadmin.entrypoints=web,websecure
-      - traefik.http.routers.pgadmin.tls.certresolver=mytlschallenge
-
-  traefik:
-    image: traefik
-    container_name: n8n_traefik
-    hostname: traefik
-    restart: always
-    command:
-      - "--api=true"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
-      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
-      - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.mytlschallenge.acme.tlschallenge=true"
-      - "--certificatesresolvers.mytlschallenge.acme.email=${SSL_EMAIL}"
-      - "--certificatesresolvers.mytlschallenge.acme.storage=/letsencrypt/acme.json"
-    ports:
-      - "127.0.0.1:8080:80"
-      - "127.0.0.1:8443:443"
-    networks:
-      default:
-        ipv4_address: 10.10.80.3
-      traefik: {}
-    depends_on:
-      - pg_admin4
-      - n8n
-    volumes:
-      - traefik_data:/letsencrypt
-      - /var/run/docker.sock:/var/run/docker.sock:ro
 
   n8n:
     image: docker.n8n.io/n8nio/n8n:stable
@@ -93,26 +58,12 @@ services:
     restart: always
     ports:
       - "127.0.0.1:5678:5678"
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.n8n.rule=PathPrefix(`/`)
-      - traefik.http.routers.n8n.entrypoints=web,websecure
-      - traefik.http.routers.n8n.tls.certresolver=mytlschallenge
-      - traefik.http.middlewares.n8n.headers.SSLRedirect=true
-      - traefik.http.middlewares.n8n.headers.STSSeconds=315360000
-      - traefik.http.middlewares.n8n.headers.browserXSSFilter=true
-      - traefik.http.middlewares.n8n.headers.contentTypeNosniff=true
-      - traefik.http.middlewares.n8n.headers.forceSTSHeader=true
-      - traefik.http.middlewares.n8n.headers.SSLHost=${DOMAIN_NAME}
-      - traefik.http.middlewares.n8n.headers.STSIncludeSubdomains=true
-      - traefik.http.middlewares.n8n.headers.STSPreload=true
-      - traefik.http.routers.n8n.middlewares=n8n@docker
     environment:
-      - N8N_HOST=${SUBDOMAIN}.${DOMAIN_NAME}
+      - N8N_HOST=${SUBDOMAIN}.${DOMAIN_NAME}   # = n8n.beyond-possible.com
       - N8N_PORT=5678
-      - N8N_PROTOCOL=https
-      - NODE_ENV=production
+      - N8N_PROTOCOL=https                     # снаружи у тебя https
       - WEBHOOK_URL=https://${SUBDOMAIN}.${DOMAIN_NAME}/
+      - NODE_ENV=production
     env_file:
       - .env
     depends_on:
@@ -125,8 +76,6 @@ services:
       - n8n_data:/home/node/.n8n
       - ./local-files:/files
 
-
-
 volumes:
   db:
     driver: local
@@ -135,8 +84,6 @@ volumes:
   pg_admin4:
     driver: local
   n8n_data:
-    driver: local
-  traefik_data:
     driver: local
 
 networks:
@@ -148,6 +95,3 @@ networks:
       config:
         - subnet: 10.10.80.0/24
           gateway: 10.10.80.1
-  traefik:
-    external: true
-    name: traefik
