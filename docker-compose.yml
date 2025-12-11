@@ -21,8 +21,6 @@ services:
     container_name: n8n_db
     hostname: postgres
     restart: always
-    ports:
-      - "5432:5432"
     environment:
       - POSTGRES_USER=${DB_POSTGRESDB_USER}
       - POSTGRES_PASSWORD=${DB_POSTGRESDB_PASSWORD}
